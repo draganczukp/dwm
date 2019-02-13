@@ -8,16 +8,17 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int gappx				= 4;
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
-static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-};
+/* static const char col_gray1[]       = "#222222"; */
+/* static const char col_gray2[]       = "#444444"; */
+/* static const char col_gray3[]       = "#bbbbbb"; */
+/* static const char col_gray4[]       = "#eeeeee"; */
+/* static const char col_cyan[]        = "#005577"; */
+/* static const char *colors[][3]      = { */
+/* 	/1*               fg         bg         border   *1/ */
+/* 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 }, */
+/* 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, */
+/* }; */
+#include "/home/killermenpl/.cache/wal/colors-wal-dwm.h"
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -30,12 +31,14 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "qutebrowser", NULL,    NULL,		  1,			0,			 -1 },
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.5; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+#include "gaplessgrid.c"
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -44,6 +47,7 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
+	{ "[|]",	  gaplessgrid },
 	{ NULL,		  NULL },
 };
 
@@ -60,33 +64,43 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "rofi", "-show", "drun"};
+static const char *roficmd[] = { "rofi", "-show", "drun", NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[] = { "qutebrowser", NULL};
 
 #include "selfrestart.c"
 
+#include <X11/XF86keysym.h>
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,             XK_Return, spawn,          {.v = termcmd } },
+	/* Start terminal */
+	{ MODKEY,			            XK_Return, spawn,          {.v = termcmd } },
+	/* Rofi */
+	{ MODKEY,                       XK_d,      spawn,          {.v = roficmd } },
+	// Kill window
+	{ MODKEY|ShiftMask,             XK_q,      killclient,     {0} },
+	// Toggle bar
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	// Rotate Stack
 	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
+	// Focus stack
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	// Change master size
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+	{ MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,                       XK_Return, zoom,           {0} },
+	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
+	// Empty for wallpaper viewing
 	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY|ShiftMask,             XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,                       XK_u,      setlayout,      {.v = &layouts[3]} },
-	{ MODKEY,                       XK_o,      setlayout,      {.v = &layouts[4]} },
+	/* { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, */
+	/* { MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, */
+	/* { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, */
+	/* { MODKEY,                       XK_u,      setlayout,      {.v = &layouts[3]} }, */
+	/* { MODKEY,                       XK_o,      setlayout,      {.v = &layouts[4]} }, */
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -106,7 +120,18 @@ static Key keys[] = {
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_r,      self_restart,   {0} },
 	{ MODKEY|ShiftMask,             XK_e,      quit,           {0} },
-	{ MODKEY,						XK_F1,		spawn,			{.v = browsercmd},}
+	{ MODKEY,						XK_F1,	   spawn,			{.v = browsercmd},},
+	{ MODKEY|ControlMask,			XK_l, 	   spawn,			{.v = { "lock", NULL },} },
+	{ 0,							XF86XK_AudioPlay, spawn,	{.v = { "playerctl", "play-pause", NULL },} },
+	{ 0,							XF86XK_AudioPrev, spawn,	{.v = { "playerctl", "previous", NULL },} },
+	{ 0,							XF86XK_AudioNext, spawn,	{.v = { "playerctl", "next", NULL },} },
+	{ Mod1Mask,						XK_Down, spawn,	{.v = { "playerctl", "play-pause", NULL },} },
+	{ Mod1Mask,						XK_Right, spawn,	{.v = { "playerctl", "previous", NULL },} },
+	{ Mod1Mask,						XK_Left, spawn,	{.v = { "playerctl", "next", NULL },} },
+	{ 0,							XK_Print,	spawn,	{.v = { "screenshot", NULL },} },
+	{ MODKEY|ShiftMask,				XK_w,	spawn,	{.v = { "wallpaper", NULL },} },
+	{ MODKEY|ControlMask,		XK_comma,  cyclelayout,    {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
 };
 
 /* button definitions */
