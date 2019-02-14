@@ -66,10 +66,22 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *roficmd[] = { "rofi", "-show", "drun", NULL };
+
+#define CMD(name, ...) static const char *name[] = { __VA_ARGS__, NULL };
+
+CMD(roficmd, "rofi", "-show", "drun")
+CMD(termcmd, "st")
+CMD(browsercmd, "qutebrowser")
+CMD(lock, "lock")
+CMD(player_pause, "playerctl", "play-pause")
+CMD(player_next, "playerctl", "next")
+CMD(player_prev, "playerctl", "previous")
+CMD(screenshot, "screenshot")
+CMD(wallpaper, "wallpaper")
+CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%")
+CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%")
+
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
-static const char *termcmd[]  = { "st", NULL };
-static const char *browsercmd[] = { "qutebrowser", NULL};
 
 #include "selfrestart.c"
 
@@ -123,16 +135,18 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_r,      self_restart,   {0} },
 	{ MODKEY|ShiftMask,             XK_e,      quit,           {0} },
 	{ MODKEY,						XK_F1,	   spawn,			{.v = browsercmd},},
-	{ MODKEY|ControlMask,			XK_l, 	   spawn,			{.v = { "lock", NULL },} },
-	{ 0,							XF86XK_AudioPlay, spawn,	{.v = { "playerctl", "play-pause", NULL },} },
-	{ 0,							XF86XK_AudioPrev, spawn,	{.v = { "playerctl", "previous", NULL },} },
-	{ 0,							XF86XK_AudioNext, spawn,	{.v = { "playerctl", "next", NULL },} },
-	{ Mod1Mask,						XK_Down, spawn,	{.v = { "playerctl", "play-pause", NULL },} },
-	{ Mod1Mask,						XK_Right, spawn,	{.v = { "playerctl", "previous", NULL },} },
-	{ Mod1Mask,						XK_Left, spawn,	{.v = { "playerctl", "next", NULL },} },
-	{ 0,							XK_Print,	spawn,	{.v = { "screenshot", NULL },} },
-	{ MODKEY|ShiftMask,				XK_w,	spawn,	{.v = { "wallpaper", NULL },} },
-	{ MODKEY|ControlMask,		XK_comma,  cyclelayout,    {.i = -1 } },
+	{ MODKEY|ControlMask,			XK_l, 	   spawn,			{.v = lock,} },
+	{ 0,							XF86XK_AudioPlay, spawn,	{.v = player_pause,} },
+	{ 0,							XF86XK_AudioPrev, spawn,	{.v = player_prev,} },
+	{ 0,							XF86XK_AudioNext, spawn,	{.v = player_next,} },
+	{ Mod1Mask,						XK_Down, spawn,				{.v = player_pause,} },
+	{ Mod1Mask,						XK_Right, spawn,			{.v = player_next,} },
+	{ Mod1Mask,						XK_Left, spawn,				{.v = player_prev,} },
+	{ 0,							XF86XK_AudioRaiseVolume,spawn,{.v = volume_up,} },
+	{ 0,							XF86XK_AudioLowerVolume,spawn,{.v = volume_down,} },
+	{ 0,							XK_Print,	spawn,			{.v = screenshot,} },
+	{ MODKEY|ShiftMask,				XK_w,	spawn,				{.v = wallpaper,} },
+	{ MODKEY|ControlMask,			XK_comma,  cyclelayout,    {.i = -1 } },
 	{ MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
 };
 
