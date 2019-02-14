@@ -30,14 +30,16 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 	{ "qutebrowser", NULL,    NULL,		  1,			0,			 -1 },
+	{ "spotify",  NULL,       NULL,       1 << 8,		0,			 -1 },
+	{ "tilda",	  NULL,		  NULL,		  0,			1,			 -1 },
 };
 
 /* layout(s) */
 static const float mfact     = 0.5; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+
 #include "gaplessgrid.c"
 
 static const Layout layouts[] = {
