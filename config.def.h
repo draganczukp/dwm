@@ -8,6 +8,8 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int gappx				= 4;
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
+static const unsigned int baralpha = 0xd0;
+static const unsigned int borderalpha = OPAQUE;
 /* static const char col_gray1[]       = "#222222"; */
 /* static const char col_gray2[]       = "#444444"; */
 /* static const char col_gray3[]       = "#bbbbbb"; */
@@ -19,6 +21,12 @@ static const char dmenufont[]       = "monospace:size=10";
 /* 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  }, */
 /* }; */
 #include "/home/killermenpl/.cache/wal/colors-wal-dwm.h"
+
+static const unsigned int alphas[][3]      = {
+	/*               fg      bg        border     */
+	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+};
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
