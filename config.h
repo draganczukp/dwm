@@ -6,7 +6,7 @@ static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int gappx				= 4;
-static const char *fonts[]          = { "monospace:size=10" };
+static const char *fonts[]          = { "DejaVuSansMono Nerd Font Mono:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 /* static const char col_gray1[]       = "#222222"; */
 /* static const char col_gray2[]       = "#444444"; */
@@ -72,12 +72,12 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 CMD(roficmd, "rofi", "-show", "drun")
 CMD(termcmd, "st")
 CMD(browsercmd, "qutebrowser")
-CMD(lock, "lock")
+CMD(lock, "/home/killermenpl/bin/lock")
 CMD(player_pause, "playerctl", "play-pause")
 CMD(player_next, "playerctl", "next")
 CMD(player_prev, "playerctl", "previous")
-CMD(screenshot, "screenshot")
-CMD(wallpaper, "wallpaper")
+CMD(screenshot, "/home/killermenpl/bin/screenshot")
+CMD(wallpaper, "/home/killermenpl/bin/wallpaper")
 CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%")
 CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%")
 
