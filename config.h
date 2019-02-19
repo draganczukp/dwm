@@ -49,7 +49,7 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
-	{ "[|]",	  gaplessgrid },
+	{ "[+]",	  gaplessgrid },
 	{ NULL,		  NULL },
 };
 
@@ -80,6 +80,8 @@ CMD(screenshot, "/home/killermenpl/bin/screenshot")
 CMD(wallpaper, "/home/killermenpl/bin/wallpaper")
 CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%")
 CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%")
+CMD(backlight_up, "xbacklight", "+5")
+CMD(backlight_down, "xbacklight", "-5")
 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
 
@@ -144,6 +146,8 @@ static Key keys[] = {
 	{ Mod1Mask,						XK_Left, spawn,				{.v = player_prev,} },
 	{ 0,							XF86XK_AudioRaiseVolume,spawn,{.v = volume_up,} },
 	{ 0,							XF86XK_AudioLowerVolume,spawn,{.v = volume_down,} },
+	{ 0,							XF86XK_MonBrightnessUp, spawn,{.v = backlight_up,} },
+	{ 0,							XF86XK_MonBrightnessDown, spawn,{.v = backlight_down,} },
 	{ 0,							XK_Print,	spawn,			{.v = screenshot,} },
 	{ MODKEY|ShiftMask,				XK_w,	spawn,				{.v = wallpaper,} },
 	{ MODKEY|ControlMask,			XK_comma,  cyclelayout,    {.i = -1 } },
