@@ -5,7 +5,7 @@ static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int gappx				= 4;
+static const int gappx				= 16;
 static const char *fonts[]          = { "DejaVuSansMono Nerd Font Mono:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const unsigned int baralpha = 0xd0;
@@ -74,19 +74,68 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 
-#define CMD(name, ...) static const char *name[] = { __VA_ARGS__, NULL };
+#define CMD(name, ...) static const char *name[] = { __VA_ARGS__, NULL }
 
-CMD(roficmd, "rofi", "-show", "drun")
-CMD(termcmd, "st")
-CMD(browsercmd, "qutebrowser")
-CMD(lock, "/home/killermenpl/bin/lock")
-CMD(player_pause, "playerctl", "play-pause")
-CMD(player_next, "playerctl", "next")
-CMD(player_prev, "playerctl", "previous")
-CMD(screenshot, "/home/killermenpl/bin/screenshot")
-CMD(wallpaper, "/home/killermenpl/bin/wallpaper")
-CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%")
-CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%")
+CMD(roficmd, "rofi", "-show", "drun");
+CMD(termcmd, "st");
+CMD(browsercmd, "qutebrowser");
+CMD(lock, "/home/killermenpl/bin/lock");
+CMD(player_pause, "playerctl", "play-pause");
+CMD(player_next, "playerctl", "next");
+CMD(player_prev, "playerctl", "previous");
+CMD(screenshot, "/home/killermenpl/bin/screenshot");
+CMD(wallpaper, "/home/killermenpl/bin/wallpaper");
+CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%");
+CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%");
+
+/*
+ * File reading code copy-pasted from StackOverflow
+ * https://stackoverflow.com/a/3747128
+ */
+void updatecolors(const Arg* args){
+	FILE *fp;
+	long lSize;
+	char *buffer;
+
+	const Arg walArg = {.v = wallpaper};
+	spawn(&walArg);
+
+	fp = fopen ( "/home/killermenpl/.cache/wal/colors" , "rb" );
+	if( !fp ) perror("/home/killermenpl/.cache/wal/colors"),exit(1);
+
+	fseek( fp , 0L , SEEK_END);
+	lSize = ftell( fp );
+	rewind( fp );
+
+	/* allocate memory for entire content */
+	buffer = calloc( 1, lSize+1 );
+	if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+
+	/* copy the file into the buffer */
+	if( 1!=fread( buffer , lSize, 1 , fp) )
+		fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
+
+	char lColors[16][9];
+	for (int i = 0; i < 16; ++i) {
+		char buff[9];
+		memcpy(buff, &buffer[i*8], 7);
+		buff[8] = '\0';
+		strcpy(lColors[i], buff);
+	}
+
+	colors[SchemeNorm][0] = lColors[15];
+	colors[SchemeNorm][0] = lColors[0];
+	colors[SchemeNorm][0] = lColors[8];
+
+	colors[SchemeSel][0] = lColors[15];
+	colors[SchemeSel][0] = lColors[2];
+	colors[SchemeSel][0] = lColors[15];
+
+	fclose(fp);
+	free(buffer);
+}
+
+// CMD(debug_notify, "notify-send", "--urgency=normal", "DEBUG NOTE")
 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
 
@@ -139,6 +188,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
+	/* { MODKEY|ShiftMask,				XK_r,		spawn, 			{.v = debug_notify,},}, */
 	{ MODKEY|ShiftMask,             XK_r,      self_restart,   {0} },
 	{ MODKEY|ShiftMask,             XK_e,      quit,           {0} },
 	{ MODKEY,						XK_F1,	   spawn,			{.v = browsercmd},},
@@ -152,7 +202,7 @@ static Key keys[] = {
 	{ 0,							XF86XK_AudioRaiseVolume,spawn,{.v = volume_up,} },
 	{ 0,							XF86XK_AudioLowerVolume,spawn,{.v = volume_down,} },
 	{ 0,							XK_Print,	spawn,			{.v = screenshot,} },
-	{ MODKEY|ShiftMask,				XK_w,	spawn,				{.v = wallpaper,} },
+	{ MODKEY|ShiftMask,				XK_w,	updatecolors,		{.v = "/home/killermenpl/.cache/wal/colors",} },
 	{ MODKEY|ControlMask,			XK_comma,  cyclelayout,    {.i = -1 } },
 	{ MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
 };
