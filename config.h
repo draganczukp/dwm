@@ -56,7 +56,7 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
-	{ "[|]",	  gaplessgrid },
+	{ "[+]",	  gaplessgrid },
 	{ NULL,		  NULL },
 };
 
@@ -74,68 +74,21 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 
-#define CMD(name, ...) static const char *name[] = { __VA_ARGS__, NULL }
+#define CMD(name, ...) static const char *name[] = { __VA_ARGS__, NULL };
 
-CMD(roficmd, "rofi", "-show", "drun");
-CMD(termcmd, "st");
-CMD(browsercmd, "qutebrowser");
-CMD(lock, "/home/killermenpl/bin/lock");
-CMD(player_pause, "playerctl", "play-pause");
-CMD(player_next, "playerctl", "next");
-CMD(player_prev, "playerctl", "previous");
-CMD(screenshot, "/home/killermenpl/bin/screenshot");
-CMD(wallpaper, "/home/killermenpl/bin/wallpaper");
-CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%");
-CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%");
-
-/*
- * File reading code copy-pasted from StackOverflow
- * https://stackoverflow.com/a/3747128
- */
-void updatecolors(const Arg* args){
-	FILE *fp;
-	long lSize;
-	char *buffer;
-
-	const Arg walArg = {.v = wallpaper};
-	spawn(&walArg);
-
-	fp = fopen ( "/home/killermenpl/.cache/wal/colors" , "rb" );
-	if( !fp ) perror("/home/killermenpl/.cache/wal/colors"),exit(1);
-
-	fseek( fp , 0L , SEEK_END);
-	lSize = ftell( fp );
-	rewind( fp );
-
-	/* allocate memory for entire content */
-	buffer = calloc( 1, lSize+1 );
-	if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
-
-	/* copy the file into the buffer */
-	if( 1!=fread( buffer , lSize, 1 , fp) )
-		fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
-
-	char lColors[16][9];
-	for (int i = 0; i < 16; ++i) {
-		char buff[9];
-		memcpy(buff, &buffer[i*8], 7);
-		buff[8] = '\0';
-		strcpy(lColors[i], buff);
-	}
-
-	colors[SchemeNorm][0] = lColors[15];
-	colors[SchemeNorm][0] = lColors[0];
-	colors[SchemeNorm][0] = lColors[8];
-
-	colors[SchemeSel][0] = lColors[15];
-	colors[SchemeSel][0] = lColors[2];
-	colors[SchemeSel][0] = lColors[15];
-
-	fclose(fp);
-	free(buffer);
-}
-
-// CMD(debug_notify, "notify-send", "--urgency=normal", "DEBUG NOTE")
+CMD(roficmd, "rofi", "-show", "drun")
+CMD(termcmd, "st")
+CMD(browsercmd, "qutebrowser")
+CMD(lock, "/home/killermenpl/bin/lock")
+CMD(player_pause, "playerctl", "play-pause")
+CMD(player_next, "playerctl", "next")
+CMD(player_prev, "playerctl", "previous")
+CMD(screenshot, "/home/killermenpl/bin/screenshot")
+CMD(wallpaper, "/home/killermenpl/bin/wallpaper")
+CMD(volume_down, "pactl", "set-sink-volume", "0", "-5%")
+CMD(volume_up, "pactl", "set-sink-volume", "0", "+5%")
+CMD(backlight_up, "xbacklight", "+5")
+CMD(backlight_down, "xbacklight", "-5")
 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", norm_bg, "-nf", norm_fg, "-sb", sel_bg, "-sf", sel_fg, NULL };
 
@@ -201,8 +154,10 @@ static Key keys[] = {
 	{ Mod1Mask,						XK_Left, spawn,				{.v = player_prev,} },
 	{ 0,							XF86XK_AudioRaiseVolume,spawn,{.v = volume_up,} },
 	{ 0,							XF86XK_AudioLowerVolume,spawn,{.v = volume_down,} },
+	{ 0,							XF86XK_MonBrightnessUp, spawn,{.v = backlight_up,} },
+	{ 0,							XF86XK_MonBrightnessDown, spawn,{.v = backlight_down,} },
 	{ 0,							XK_Print,	spawn,			{.v = screenshot,} },
-	{ MODKEY|ShiftMask,				XK_w,	updatecolors,		{.v = "/home/killermenpl/.cache/wal/colors",} },
+	{ MODKEY|ShiftMask,				XK_w,	spawn,		{.v = wallpaper,} },
 	{ MODKEY|ControlMask,			XK_comma,  cyclelayout,    {.i = -1 } },
 	{ MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
 };
